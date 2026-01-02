@@ -27,7 +27,7 @@ try {
 
     $var_decimal = "DECIMAL(15,2) DEFAULT 0.00";
 
-    // --- GESTIÓN DE USUARIOS ---
+    // --- sistema_usuarios ---
     $nombre_tabla = 'sistema_usuarios';
     $result = $conn->query("SHOW TABLES LIKE '$nombre_tabla'");
 
@@ -37,14 +37,14 @@ try {
 
         $create_usuarios_sql = "
             CREATE TABLE `$nombre_tabla` (
-                `id`                  INT(11) NOT NULL AUTO_INCREMENT,
-                `alias`               VARCHAR(50) NOT NULL,
-                `correo_electronico`  VARCHAR(150) NOT NULL,
-                `contrasena`          VARCHAR(255) NOT NULL,
-                `nombre_completo`     VARCHAR(100) DEFAULT '',
-                `activo`              TINYINT(1) DEFAULT 1,
-                `token_recuperacion`  VARCHAR(255) DEFAULT '',
-                `ip_estacion`         VARCHAR(40) DEFAULT '',
+                `id`                            INT(11) NOT NULL AUTO_INCREMENT,
+                `alias`                         VARCHAR(50) NOT NULL,
+                `correo_electronico`            VARCHAR(150) NOT NULL,
+                `contrasena`                    VARCHAR(255) NOT NULL,
+                `nombre_completo`               VARCHAR(100) DEFAULT '',
+                `activo`                        TINYINT(1) DEFAULT 1,
+                `token_recuperacion`            VARCHAR(255) DEFAULT '',
+                `ip_estacion`                   VARCHAR(40) DEFAULT '',
                 PRIMARY KEY (`id`),
                 UNIQUE KEY `uk_usuario` (`alias`),
                 UNIQUE KEY `uk_email` (`correo_electronico`)
@@ -60,14 +60,14 @@ try {
         echo '<br>';
 
         $alter_usuarios_sqls = [
-            "MODIFY COLUMN `id`                  INT(11) NOT NULL AUTO_INCREMENT",
-            "MODIFY COLUMN `alias`               VARCHAR(50) NOT NULL",
-            "MODIFY COLUMN `correo_electronico`  VARCHAR(150) NOT NULL",
-            "MODIFY COLUMN `contrasena`          VARCHAR(255) NOT NULL",
-            "MODIFY COLUMN `nombre_completo`     VARCHAR(100) DEFAULT ''",
-            "MODIFY COLUMN `activo`              TINYINT(1) DEFAULT 1",
-            "MODIFY COLUMN `token_recuperacion`  VARCHAR(255) DEFAULT ''",
-            "MODIFY COLUMN `ip_estacion`         VARCHAR(40) DEFAULT ''",
+            "MODIFY COLUMN `id`                 INT(11) NOT NULL AUTO_INCREMENT",
+            "MODIFY COLUMN `alias`              VARCHAR(50) NOT NULL",
+            "MODIFY COLUMN `correo_electronico` VARCHAR(150) NOT NULL",
+            "MODIFY COLUMN `contrasena`         VARCHAR(255) NOT NULL",
+            "MODIFY COLUMN `nombre_completo`    VARCHAR(100) DEFAULT ''",
+            "MODIFY COLUMN `activo`             TINYINT(1) DEFAULT 1",
+            "MODIFY COLUMN `token_recuperacion` VARCHAR(255) DEFAULT ''",
+            "MODIFY COLUMN `ip_estacion`        VARCHAR(40) DEFAULT ''",
         ];
 
         foreach ($alter_usuarios_sqls as $sql) {
@@ -77,6 +77,75 @@ try {
         echo "✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente.";
         echo '<br>';  
     }
+
+    // --- pacientes_ficha ---
+    $nombre_tabla = 'pacientes_ficha';
+    $result = $conn->query("SHOW TABLES LIKE '$nombre_tabla'");
+
+    if ($result->num_rows == 0) {
+    echo "🆕 Tabla '$nombre_tabla' no existe. Creando...";
+    echo '<br>';
+
+    $create_pacientes_sql = "
+        CREATE TABLE `$nombre_tabla` (
+            `id`                                INT(11) NOT NULL AUTO_INCREMENT,
+            `nombres`                           VARCHAR(100) NOT NULL,
+            `apellidos`                         VARCHAR(100) NOT NULL,
+            `no_identificacion`                 VARCHAR(20) NOT NULL,
+            `fecha_nacimiento`                  DATE NOT NULL,
+            `genero`                            VARCHAR(20) DEFAULT '',
+            `telefono_principal`                VARCHAR(20) DEFAULT '',
+            `correo_electronico`                VARCHAR(150) DEFAULT '',
+            `direccion_residencia`              TEXT,
+            `contacto_emergencia`               VARCHAR(150) DEFAULT '',
+            `tel_emergencia`                    VARCHAR(20) DEFAULT '',
+            `tipo_sangre`                       VARCHAR(5) DEFAULT '',
+            `alergias`                          TEXT,
+            `enfermedades_cronicas`             TEXT,
+            `cirugias_previas`                  TEXT,
+            `antecedentes_fam`                  TEXT,
+            `fecha_registro`                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            UNIQUE KEY `uk_paciente_id` (`no_identificacion`),
+            UNIQUE KEY `uk_paciente_email` (`correo_electronico`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    ";
+
+    $conn->query($create_pacientes_sql);
+    echo "✅ Tabla '$nombre_tabla' creada correctamente.";
+    echo '<br>';
+
+} else {
+    echo "🛠 La tabla '$nombre_tabla' ya existe. Aplicando modificaciones...";
+    echo '<br>';
+
+    $alter_pacientes_sqls = [
+        "MODIFY COLUMN `id`                     INT(11) NOT NULL AUTO_INCREMENT",
+        "MODIFY COLUMN `nombres`                VARCHAR(100) NOT NULL",
+        "MODIFY COLUMN `apellidos`              VARCHAR(100) NOT NULL",
+        "MODIFY COLUMN `no_identificacion`      VARCHAR(20) NOT NULL",
+        "MODIFY COLUMN `fecha_nacimiento`       DATE NOT NULL",
+        "MODIFY COLUMN `genero`                 VARCHAR(20) DEFAULT ''",
+        "MODIFY COLUMN `telefono_principal`     VARCHAR(20) DEFAULT ''",
+        "MODIFY COLUMN `correo_electronico`     VARCHAR(150) DEFAULT ''",
+        "MODIFY COLUMN `direccion_residencia`   TEXT",
+        "MODIFY COLUMN `contacto_emergencia`    VARCHAR(150) DEFAULT ''",
+        "MODIFY COLUMN `tel_emergencia`         VARCHAR(20) DEFAULT ''",
+        "MODIFY COLUMN `tipo_sangre`            VARCHAR(5) DEFAULT ''",
+        "MODIFY COLUMN `alergias`               TEXT",
+        "MODIFY COLUMN `enfermedades_cronicas`  TEXT",
+        "MODIFY COLUMN `cirugias_previas`       TEXT",
+        "MODIFY COLUMN `antecedentes_fam`       TEXT"
+    ];
+
+    foreach ($alter_pacientes_sqls as $sql) {
+        $conn->query("ALTER TABLE `$nombre_tabla` $sql");
+    }
+
+    echo "✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente.";
+    echo '<br>';  
+}
+
 
     echo "✅ ✅ ESTRUCTURA BD PROCESADA CORRECTAMENTE ✅ ✅...";
     $conn->close();
