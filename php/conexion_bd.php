@@ -15,7 +15,7 @@ try {
     $conn->set_charset("utf8mb4");
 
     // Opcional: Mensaje de éxito
-     echo "✅ Conexión al servidor exitosa.";
+  //   echo "✅ Conexión al servidor exitosa.";
 
 } catch (mysqli_sql_exception $e) {
     die("❌ Error de conexión: " . $e->getMessage());
