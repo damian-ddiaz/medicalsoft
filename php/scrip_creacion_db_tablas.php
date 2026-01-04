@@ -52,12 +52,10 @@ try {
         ";
 
         $conn->query($create_usuarios_sql);
-        echo "✅ Tabla '$nombre_tabla' creada correctamente.";
-        echo '<br>';
+        echo "\n ✅ Tabla '$nombre_tabla' creada correctamente. \n";
 
     } else {
-        echo "🛠 La tabla '$nombre_tabla' ya existe. Aplicando modificaciones...";
-        echo '<br>';
+        echo "\n 🛠 La tabla '$nombre_tabla' ya existe. Aplicando modificaciones...\n";
 
         $alter_usuarios_sqls = [
             "MODIFY COLUMN `id`                 INT(11) NOT NULL AUTO_INCREMENT",
@@ -74,8 +72,7 @@ try {
             $conn->query("ALTER TABLE `$nombre_tabla` $sql");
         }
 
-        echo "✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente.";
-        echo '<br>';  
+        echo "\n ✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente. \n";
     }
 
     // --- pacientes_ficha ---
@@ -83,8 +80,7 @@ try {
     $result = $conn->query("SHOW TABLES LIKE '$nombre_tabla'");
 
     if ($result->num_rows == 0) {
-    echo "🆕 Tabla '$nombre_tabla' no existe. Creando...";
-    echo '<br>';
+    echo "\n 🆕 Tabla '$nombre_tabla' no existe. Creando...\n";
 
     $create_pacientes_sql = "
         CREATE TABLE `$nombre_tabla` (
@@ -101,9 +97,8 @@ try {
             `tel_emergencia`                    VARCHAR(20) DEFAULT '',
             `tipo_sangre`                       VARCHAR(5) DEFAULT '',
             `alergias`                          TEXT,
-            `enfermedades_cronicas`             TEXT,
-            `cirugias_previas`                  TEXT,
-            `antecedentes_fam`                  TEXT,
+            `antecedentes_personales`           TEXT,
+            `antecedentes_familiares`           TEXT,
             `fecha_registro`                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`),
             UNIQUE KEY `uk_paciente_id` (`no_identificacion`),
@@ -112,12 +107,10 @@ try {
     ";
 
     $conn->query($create_pacientes_sql);
-    echo "✅ Tabla '$nombre_tabla' creada correctamente.";
-    echo '<br>';
+    echo "\n ✅ Tabla '$nombre_tabla' creada correctamente.\n";
 
 } else {
-    echo "🛠 La tabla '$nombre_tabla' ya existe. Aplicando modificaciones...";
-    echo '<br>';
+    echo "\n 🛠 La tabla '$nombre_tabla' ya existe. Aplicando modificaciones...\n";
 
     $alter_pacientes_sqls = [
         "MODIFY COLUMN `id`                     INT(11) NOT NULL AUTO_INCREMENT",
@@ -133,21 +126,19 @@ try {
         "MODIFY COLUMN `tel_emergencia`         VARCHAR(20) DEFAULT ''",
         "MODIFY COLUMN `tipo_sangre`            VARCHAR(5) DEFAULT ''",
         "MODIFY COLUMN `alergias`               TEXT",
-        "MODIFY COLUMN `enfermedades_cronicas`  TEXT",
-        "MODIFY COLUMN `cirugias_previas`       TEXT",
-        "MODIFY COLUMN `antecedentes_fam`       TEXT"
+        "MODIFY COLUMN `antecedentes_personales`TEXT",
+        "MODIFY COLUMN `antecedentes_familiares`TEXT"
     ];
 
     foreach ($alter_pacientes_sqls as $sql) {
         $conn->query("ALTER TABLE `$nombre_tabla` $sql");
     }
 
-    echo "✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente.";
-    echo '<br>';  
+    echo "\n ✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente.\n";
 }
 
 
-    echo "✅ ✅ ESTRUCTURA BD PROCESADA CORRECTAMENTE ✅ ✅...";
+    echo "\n ✅ ✅ ESTRUCTURA BD PROCESADA CORRECTAMENTE ✅ ✅...";
     $conn->close();
 
 } catch (mysqli_sql_exception $e) {
