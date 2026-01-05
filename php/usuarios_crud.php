@@ -1,22 +1,29 @@
 <?php
+// 1. CONFIGURACIÓN Y CONEXIÓN
 require_once 'conexion_bd.php'; 
+
+// Habilitar reporte de errores para capturar excepciones en el bloque try-catch
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $mensaje = "";
 $tipo_alerta = "alert-info";
 
-// --- 1. PROCESAMIENTO DE DATOS ---
+// --- 2. PROCESAMIENTO DE DATOS ---
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $id = isset($_POST['id']) ? mysqli_real_escape_string($conexion, $_POST['id']) : '';
-    $nombre = mysqli_real_escape_string($conexion, $_POST['nombre_completo']);
-    $correo = mysqli_real_escape_string($conexion, $_POST['correo_electronico']);
-    $alias = mysqli_real_escape_string($conexion, $_POST['alias']);
+    // Limpiamos los datos básicos
+    $id = (!empty($_POST['id'])) ? mysqli_real_escape_string($conn, $_POST['id']) : null;
+    $nombre = mysqli_real_escape_string($conn, $_POST['nombre_completo']);
+    $correo = mysqli_real_escape_string($conn, $_POST['correo_electronico']);
+    $alias = mysqli_real_escape_string($conn, $_POST['alias']);
     
     try {
         if (isset($_POST['accion_guardar'])) {
             if (empty($id)) {
-                // INSERTAR NUEVO
+                // --- INSERTAR NUEVO USUARIO ---
                 $pass_raw = $_POST['contrasena'];
-                if(empty($pass_raw)) throw new Exception("La contraseña es obligatoria para nuevos registros.");
+                if(empty($pass_raw)) {
+                    throw new Exception("La contraseña es obligatoria para nuevos registros.");
+                }
                 
                 $pass = password_hash($pass_raw, PASSWORD_BCRYPT);
                 $ip = $_SERVER['REMOTE_ADDR'];
@@ -24,31 +31,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $sql = "INSERT INTO sistema_usuarios (alias, correo_electronico, contrasena, nombre_completo, ip_estacion, activo) 
                         VALUES ('$alias', '$correo', '$pass', '$nombre', '$ip', 1)";
                 
-                if (mysqli_query($conexion, $sql)) {
-                    header("Location: usuarios_crud.php?res=success");
-                    exit();
-                }
+                mysqli_query($conn, $sql);
+                header("Location: " . $_SERVER['PHP_SELF'] . "?res=success");
+                exit();
+
             } else {
-                // ACTUALIZAR EXISTENTE
+                // --- ACTUALIZAR USUARIO EXISTENTE ---
+                // Nota: En actualización no tocamos la contraseña según tu lógica original
                 $sql = "UPDATE sistema_usuarios SET alias='$alias', correo_electronico='$correo', nombre_completo='$nombre' WHERE id=$id";
-                if (mysqli_query($conexion, $sql)) {
-                    header("Location: usuarios_crud.php?res=updated");
-                    exit();
-                }
+                
+                mysqli_query($conn, $sql);
+                header("Location: " . $_SERVER['PHP_SELF'] . "?res=updated");
+                exit();
             }
         }
 
         if (isset($_POST['accion_eliminar']) && !empty($id)) {
+            // --- ELIMINAR USUARIO ---
             $sql = "DELETE FROM sistema_usuarios WHERE id = $id";
-            if (mysqli_query($conexion, $sql)) {
-                header("Location: usuarios_crud.php?res=deleted");
-                exit();
-            }
+            mysqli_query($conn, $sql);
+            header("Location: " . $_SERVER['PHP_SELF'] . "?res=deleted");
+            exit();
         }
+
     } catch (mysqli_sql_exception $e) {
-        // Redirigir con el código de error para evitar reenvío de formulario
+        // Error 1062 es para entradas duplicadas (Unique keys en BD)
         $err = ($e->getCode() == 1062) ? "duplicate" : "error";
-        header("Location: usuarios_crud.php?res=$err");
+        header("Location: " . $_SERVER['PHP_SELF'] . "?res=$err");
         exit();
     } catch (Exception $e) {
         $mensaje = "⚠️ " . $e->getMessage();
@@ -56,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 
-// --- 2. CAPTURA DE MENSAJES TRAS REDIRECCIÓN ---
+// --- 3. CAPTURA DE MENSAJES TRAS REDIRECCIÓN (PRG Pattern) ---
 if (isset($_GET['res'])) {
     switch ($_GET['res']) {
         case 'success': $mensaje = "✅ Usuario guardado con éxito."; $tipo_alerta = "alert-success"; break;
@@ -67,8 +76,8 @@ if (isset($_GET['res'])) {
     }
 }
 
-// --- 3. OBTENER LISTA ACTUALIZADA ---
-$resultado = mysqli_query($conexion, "SELECT * FROM sistema_usuarios ORDER BY id DESC");
+// --- 4. OBTENER LISTA PARA LA TABLA ---
+$resultado = mysqli_query($conn, "SELECT * FROM sistema_usuarios ORDER BY id DESC");
 ?>
 
 <!DOCTYPE html>
@@ -99,7 +108,7 @@ $resultado = mysqli_query($conexion, "SELECT * FROM sistema_usuarios ORDER BY id
     <div class="main-container">
         
         <div class="card p-4 p-md-5">
-            <h2 class="text-center fw-bold mb-4">Registro Único</h2>
+            <h2 class="text-center fw-bold mb-4">Usuarios del Sistema</h2>
             
             <?php if($mensaje): ?>
                 <div class="alert <?= $tipo_alerta ?> py-2 text-center small shadow-sm"><?= $mensaje ?></div>
@@ -139,19 +148,24 @@ $resultado = mysqli_query($conexion, "SELECT * FROM sistema_usuarios ORDER BY id
             <h6 class="fw-bold mb-3 text-secondary">Usuarios Registrados</h6>
             <table class="table table-hover align-middle mb-0 small">
                 <tbody>
-                    <?php while($u = mysqli_fetch_assoc($resultado)): ?>
-                    <tr>
-                        <td>
-                            <div class="fw-bold text-dark"><?= htmlspecialchars($u['alias']) ?></div>
-                        </td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-outline-primary py-0" 
-                                    onclick="editar('<?= $u['id'] ?>', '<?= $u['alias'] ?>', '<?= $u['correo_electronico'] ?>', '<?= $u['nombre_completo'] ?>')">
-                                Seleccionar
-                            </button>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
+                    <?php if(mysqli_num_rows($resultado) > 0): ?>
+                        <?php while($u = mysqli_fetch_assoc($resultado)): ?>
+                        <tr>
+                            <td>
+                                <div class="fw-bold text-dark"><?= htmlspecialchars($u['alias']) ?></div>
+                                <div class="text-muted" style="font-size: 0.75rem;"><?= htmlspecialchars($u['correo_electronico']) ?></div>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-outline-primary py-0" 
+                                        onclick="editar('<?= $u['id'] ?>', '<?= addslashes($u['alias']) ?>', '<?= addslashes($u['correo_electronico']) ?>', '<?= addslashes($u['nombre_completo']) ?>')">
+                                    Seleccionar
+                                </button>
+                            </td>
+                        </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr><td colspan="2" class="text-center text-muted">No hay usuarios registrados.</td></tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -165,6 +179,7 @@ $resultado = mysqli_query($conexion, "SELECT * FROM sistema_usuarios ORDER BY id
         document.getElementById('correo').value = correo;
         document.getElementById('nombre').value = nombre;
         
+        // Ocultar campo contraseña al editar (opcional, según tu lógica)
         document.getElementById('section_pass').style.display = 'none';
         document.getElementById('btn_eliminar_form').disabled = false;
         document.getElementById('btn_principal').innerText = 'Guardar Cambios';
