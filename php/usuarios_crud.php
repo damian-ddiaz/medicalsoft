@@ -1,6 +1,7 @@
 <?php
 // 1. CONFIGURACIÓN Y CONEXIÓN
 require_once 'conexion_bd.php'; 
+mysqli_select_db($conn, 'medicalsoft'); // Agrega esta línea
 
 // Habilitar reporte de errores para capturar excepciones en el bloque try-catch
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
