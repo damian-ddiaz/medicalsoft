@@ -135,13 +135,24 @@ $resultado = mysqli_query($conn, "SELECT * FROM pacientes_ficha ORDER BY id DESC
                         <option value="Otro">Otro</option>
                     </select>
                 </div>
+
                 <div class="col-md-3">
                     <label class="form-label">Teléfono</label>
                     <input type="text" name="telefono_principal" id="p_tel" class="form-control mb-3">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Tipo Sangre</label>
-                    <input type="text" name="tipo_sangre" id="p_sangre" class="form-control mb-3" placeholder="O+">
+                    <label class="form-label">Grupo Sanguíneo</label>
+                    <select name="tipo_sangre" id="p_sangre" class="form-select mb-3">
+                        <option value="">Seleccione...</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                    </select>
                 </div>
 
                 <div class="col-md-6">
@@ -178,6 +189,11 @@ $resultado = mysqli_query($conn, "SELECT * FROM pacientes_ficha ORDER BY id DESC
 
             <div class="d-flex gap-2 mt-3">
                 <button type="submit" name="accion_guardar" id="btn_guardar" class="btn btn-primary flex-grow-1">Guardar Paciente</button>
+              
+                <button type="button" id="btn_imprimir" class="btn btn-dark" onclick="imprimirPDF()" disabled>
+                    <i class="bi bi-printer"></i> Imprimir PDF
+                </button>
+
                 <button type="submit" name="accion_eliminar" id="btn_eliminar" class="btn btn-outline-danger" onclick="return confirm('¿Borrar paciente?')" disabled>Eliminar</button>
                 <button type="button" onclick="resetForm()" class="btn btn-light">Limpiar</button>
             </div>
@@ -232,6 +248,7 @@ function editar(data) {
     document.getElementById('p_ant_f').value = data.antecedentes_familiares;
 
     document.getElementById('btn_eliminar').disabled = false;
+    document.getElementById('btn_imprimir').disabled = false; // Habilitar imprimir
     document.getElementById('btn_guardar').innerText = 'Actualizar Paciente';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -240,7 +257,14 @@ function resetForm() {
     document.getElementById('formPaciente').reset();
     document.getElementById('p_id').value = '';
     document.getElementById('btn_eliminar').disabled = true;
+    document.getElementById('btn_imprimir').disabled = true; // Deshabilitar imprimir
     document.getElementById('btn_guardar').innerText = 'Guardar Paciente';
+}
+function imprimirPDF() {
+    const id = document.getElementById('p_id').value;
+    if (id) {
+        window.open('pasciente_ficha.php?id=' + id, '_blank');
+    }
 }
 </script>
 
