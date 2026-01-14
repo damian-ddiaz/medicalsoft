@@ -263,7 +263,7 @@ function resetForm() {
 function imprimirPDF() {
     const id = document.getElementById('p_id').value;
     if (id) {
-        window.open('pasciente_ficha.php?id=' + id, '_blank');
+        window.open('pasciente_ficha_pdf.php?id=' + id, '_blank');
     }
 }
 </script>

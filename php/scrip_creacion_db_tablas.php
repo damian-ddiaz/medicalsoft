@@ -27,6 +27,69 @@ try {
 
     $var_decimal = "DECIMAL(15,2) DEFAULT 0.00";
 
+// --- sistema_alergias ---
+    $nombre_tabla_alergias = 'sistema_alergias';
+    $result_alergias = $conn->query("SHOW TABLES LIKE '$nombre_tabla_alergias'");
+
+    if ($result_alergias->num_rows == 0) {
+        echo "\n 🆕 Tabla '$nombre_tabla_alergias' no existe. Creando...\n";
+
+        $create_alergias_sql = "
+            CREATE TABLE `$nombre_tabla_alergias` (
+                `id`                    INT(11) NOT NULL AUTO_INCREMENT,
+                `categoria`             ENUM('Alimentaria', 'Medicamentosa', 'Ambiental', 'Otra') NOT NULL,
+                `sustancia`             VARCHAR(100) NOT NULL,
+                `nivel_criticidad`      ENUM('Bajo', 'Moderado', 'Alto', 'Vital/Anafilaxis') DEFAULT 'Moderado',
+                `reaccion_descripcion`  TEXT,
+                PRIMARY KEY (`id`),
+                INDEX `idx_sustancia` (`sustancia`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ";
+
+        if ($conn->query($create_alergias_sql)) {
+            echo " ✅ Tabla '$nombre_tabla_alergias' creada correctamente.\n";
+        }
+
+        // --- Generando Data predeterminda ---
+        $alergias_iniciales = [
+            ['Medicamentosa', 'Penicilina', 'Vital/Anafilaxis', 'Shock anafiláctico, dificultad respiratoria.'],
+            ['Alimentaria', 'Maní (Cacahuate)', 'Vital/Anafilaxis', 'Hinchazón de garganta y cierre de vías aéreas.'],
+            ['Medicamentosa', 'Aspirina', 'Alto', 'Asma inducida y urticaria grave.'],
+            ['Ambiental', 'Látex', 'Moderado', 'Dermatitis de contacto e inflamación local.'],
+            ['Alimentaria', 'Mariscos', 'Alto', 'Vómitos, urticaria y posible anafilaxia.'],
+            ['Ambiental', 'Polen de Gramíneas', 'Bajo', 'Rinitis alérgica y lagrimeo.'],
+            ['Medicamentosa', 'Sulfonamidas', 'Alto', 'Erupciones cutáneas severas (Síndrome de Stevens-Johnson).'],
+            ['Alimentaria', 'Leche de vaca', 'Moderado', 'Trastornos digestivos y eccema.'],
+            ['Otra', 'Veneno de Abeja', 'Vital/Anafilaxis', 'Reacción sistémica inmediata.'],
+            ['Medicamentosa', 'Ibuprofeno', 'Moderado', 'Hinchazón facial y sibilancias.']
+            ];
+
+        foreach ($alergias_iniciales as $alergia) {
+            $sql = "INSERT INTO sistema_alergias (categoria, sustancia, nivel_criticidad, reaccion_descripcion) 
+                    VALUES ('{$alergia[0]}', '{$alergia[1]}', '{$alergia[2]}', '{$alergia[3]}')";
+            $conn->query($sql);
+        }
+
+
+
+
+    } else {
+        echo "\n 🛠 La tabla '$nombre_tabla_alergias' ya existe. Aplicando modificaciones...\n";
+
+        $alter_alergias_sqls = [
+            "MODIFY COLUMN `id`                    INT(11) NOT NULL AUTO_INCREMENT",
+            "MODIFY COLUMN `categoria`             ENUM('Alimentaria', 'Medicamentosa', 'Ambiental', 'Otra') NOT NULL",
+            "MODIFY COLUMN `sustancia`             VARCHAR(100) NOT NULL",
+            "MODIFY COLUMN `nivel_criticidad`      ENUM('Bajo', 'Moderado', 'Alto', 'Vital/Anafilaxis') DEFAULT 'Moderado'",
+            "MODIFY COLUMN `reaccion_descripcion`  TEXT"
+        ];
+
+        foreach ($alter_alergias_sqls as $sql) {
+            $conn->query("ALTER TABLE `$nombre_tabla_alergias` $sql");
+        }
+        echo " ✅ Modificaciones en '$nombre_tabla_alergias' aplicadas.\n";
+    }
+
     // --- sistema_usuarios ---
     $nombre_tabla = 'sistema_usuarios';
     $result = $conn->query("SHOW TABLES LIKE '$nombre_tabla'");
