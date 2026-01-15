@@ -1,40 +1,58 @@
 <?php
+// 1. Reporte de errores (Solo para desarrollo)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// 2. Inicio de sesión y conexión
 session_start();
 require_once 'conexion_bd.php';
 
 $mensaje = "";
 
-// 1. Proceso de Autenticación
+// 3. Proceso de Autenticación
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $alias_o_correo = mysqli_real_escape_string($conn, $_POST['usuario']);
+    // Verificamos que la conexión exista
+    if (!$conn) {
+        die("Error de conexión a la base de datos.");
+    }
+
+    // Limpiamos los datos de entrada
+    $alias_o_correo = trim($_POST['usuario']);
     $password = $_POST['password'];
 
     // Buscamos por alias o por correo electrónico
+    // Usamos sentencias preparadas para evitar Inyección SQL
     $sql = "SELECT id, alias, contrasena, activo FROM sistema_usuarios WHERE (alias = ? OR correo_electronico = ?) LIMIT 1";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $alias_o_correo, $alias_o_correo);
-    $stmt->execute();
-    $resultado = $stmt->get_result();
+    
+    if ($stmt = $conn->prepare($sql)) {
+        $stmt->bind_param("ss", $alias_o_correo, $alias_o_correo);
+        $stmt->execute();
+        $resultado = $stmt->get_result();
 
-    if ($usuario = $resultado->fetch_assoc()) {
-        // Verificamos si la cuenta está activa
-        if ($usuario['activo'] == 0) {
-            $mensaje = '<div class="alert alert-warning">Esta cuenta está desactivada.</div>';
-        } else {
-            // Verificación de contraseña (asumiendo que usas password_hash en el registro)
-            if (password_verify($password, $usuario['contrasena'])) {
-                $_SESSION['usuario_id'] = $usuario['id'];
-                $_SESSION['alias'] = $usuario['alias'];
-                
-                // Redirigir al sistema
-                header("Location: dashboard.php");
-                exit();
+        if ($usuario = $resultado->fetch_assoc()) {
+            // Verificamos si la cuenta está activa
+            if ($usuario['activo'] == 0) {
+                $mensaje = '<div class="alert alert-warning">Esta cuenta está desactivada.</div>';
             } else {
-                $mensaje = '<div class="alert alert-danger">Contraseña incorrecta.</div>';
+                // Verificación de contraseña
+                if (password_verify($password, $usuario['contrasena'])) {
+                    $_SESSION['usuario_id'] = $usuario['id'];
+                    $_SESSION['alias'] = $usuario['alias'];
+                    
+                    // Redirigir al sistema
+                    header("Location: dashboard.php");
+                    exit();
+                } else {
+                    $mensaje = '<div class="alert alert-danger">Contraseña incorrecta.</div>';
+                }
             }
+        } else {
+            $mensaje = '<div class="alert alert-danger">El usuario no existe.</div>';
         }
+        $stmt->close();
     } else {
-        $mensaje = '<div class="alert alert-danger">El usuario no existe.</div>';
+        $mensaje = '<div class="alert alert-danger">Error en la consulta a la base de datos.</div>';
     }
 }
 ?>

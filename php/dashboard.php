@@ -113,9 +113,30 @@ try {
             <li class="nav-item">
                 <a href="#" class="nav-link"><i class="bi bi-person-badge"></i> Pacientes</a>
             </li>
+           <!-- 
             <li class="nav-item">
                 <a href="#" class="nav-link"><i class="bi bi-gear"></i> Configuración</a>
             </li>
+            -->
+
+            <li class="nav-item">
+                <a href="#submenuConfig" class="nav-link d-flex align-items-center" data-bs-toggle="collapse">
+                    <i class="bi bi-gear"></i> 
+                    <span>Configuración</span>
+                    <i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+
+                <div class="collapse" id="submenuConfig">
+                    <ul class="nav flex-column ps-4">
+                        <li class="nav-item">
+                            <a href="ajustes_generales.php" class="nav-link py-1 small text-muted">
+                                <i class="bi bi-dot"></i> Ajustes Generales
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+
             <li class="nav-item mt-5">
                 <a href="login.php" class="nav-link text-danger"><i class="bi bi-box-arrow-left"></i> Cerrar Sesión</a>
             </li>

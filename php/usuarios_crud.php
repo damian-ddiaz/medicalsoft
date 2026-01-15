@@ -136,7 +136,7 @@ $resultado = mysqli_query($conn, "SELECT * FROM sistema_usuarios ORDER BY id DES
                     <button type="submit" name="accion_guardar" id="btn_principal" class="btn-custom btn-guardar shadow-sm">Guardar</button>
                     <button type="submit" name="accion_eliminar" id="btn_eliminar_form" class="btn-custom btn-eliminar" 
                             onclick="return confirm('¿Seguro que desea eliminar este registro?')" disabled>Eliminar</button>
-                    <a href="index.php" class="btn-custom btn-salir d-flex align-items-center justify-content-center">Salir</a>
+                    <a href="dashboard.php" class="btn-custom btn-salir d-flex align-items-center justify-content-center">Salir</a>
                 </div>
                 
                 <div class="text-center mt-4">

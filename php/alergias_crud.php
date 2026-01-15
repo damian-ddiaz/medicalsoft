@@ -142,13 +142,22 @@ $resultado = mysqli_query($conn, "SELECT * FROM sistema_alergias ORDER BY catego
                 </thead>
                 <tbody>
                     <?php while($row = mysqli_fetch_assoc($resultado)): 
-                        $color = match($row['nivel_criticidad']) {
-                            'Bajo' => 'bg-info',
-                            'Moderado' => 'bg-warning text-dark',
-                            'Alto' => 'bg-danger',
-                            'Vital/Anafilaxis' => 'bg-dark',
-                            default => 'bg-secondary'
-                        };
+                        switch ($row['nivel_criticidad']) {
+                            case 'Bajo':
+                                $color = 'bg-info';
+                                break;
+                            case 'Moderado':
+                                $color = 'bg-warning text-dark';
+                                break;
+                            case 'Alto':
+                                $color = 'bg-danger';
+                                break;
+                            case 'Vital/Anafilaxis':
+                                $color = 'bg-dark';
+                                break;
+                            default:
+                                $color = 'bg-secondary';
+                        }
                     ?>
                     <tr>
                         <td><strong><?= htmlspecialchars($row['sustancia']) ?></strong></td>
