@@ -27,7 +27,7 @@ try {
 
     $var_decimal = "DECIMAL(15,2) DEFAULT 0.00";
 
-// --- sistema_alergias ---
+    // --- sistema_alergias ---
     $nombre_tabla_alergias = 'sistema_alergias';
     $result_alergias = $conn->query("SHOW TABLES LIKE '$nombre_tabla_alergias'");
 
@@ -50,25 +50,6 @@ try {
             echo " ✅ Tabla '$nombre_tabla_alergias' creada correctamente.\n";
         }
 
-        // --- Generando Data predeterminda ---
-        $alergias_iniciales = [
-            ['Medicamentosa', 'Penicilina', 'Vital/Anafilaxis', 'Shock anafiláctico, dificultad respiratoria.'],
-            ['Alimentaria', 'Maní (Cacahuate)', 'Vital/Anafilaxis', 'Hinchazón de garganta y cierre de vías aéreas.'],
-            ['Medicamentosa', 'Aspirina', 'Alto', 'Asma inducida y urticaria grave.'],
-            ['Ambiental', 'Látex', 'Moderado', 'Dermatitis de contacto e inflamación local.'],
-            ['Alimentaria', 'Mariscos', 'Alto', 'Vómitos, urticaria y posible anafilaxia.'],
-            ['Ambiental', 'Polen de Gramíneas', 'Bajo', 'Rinitis alérgica y lagrimeo.'],
-            ['Medicamentosa', 'Sulfonamidas', 'Alto', 'Erupciones cutáneas severas (Síndrome de Stevens-Johnson).'],
-            ['Alimentaria', 'Leche de vaca', 'Moderado', 'Trastornos digestivos y eccema.'],
-            ['Otra', 'Veneno de Abeja', 'Vital/Anafilaxis', 'Reacción sistémica inmediata.'],
-            ['Medicamentosa', 'Ibuprofeno', 'Moderado', 'Hinchazón facial y sibilancias.']
-            ];
-
-        foreach ($alergias_iniciales as $alergia) {
-            $sql = "INSERT INTO sistema_alergias (categoria, sustancia, nivel_criticidad, reaccion_descripcion) 
-                    VALUES ('{$alergia[0]}', '{$alergia[1]}', '{$alergia[2]}', '{$alergia[3]}')";
-            $conn->query($sql);
-        }
     } else {
         echo "\n 🛠 La tabla '$nombre_tabla_alergias' ya existe. Aplicando modificaciones...\n";
 
@@ -85,7 +66,6 @@ try {
         }
         echo " ✅ Modificaciones en '$nombre_tabla_alergias' aplicadas.\n";
     }
-
 
     // --- especialidades_medicas ---
     $nombre_tabla = 'sistema_especialidades_medicas';
@@ -149,44 +129,6 @@ try {
 
         echo "\n ✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente. \n";
     }
-
-        // --- Datos predeterminados (Ordenados A-Z) ---
-        $especialidades_default = [
-            ['Anestesiología', 'Cuidado y alivio del dolor antes y después de cirugías.'],
-            ['Cardiología', 'Estudio y tratamiento de enfermedades del corazón.'],
-            ['Dermatología', 'Tratamiento de afecciones de la piel, cabello y uñas.'],
-            ['Endocrinología', 'Tratamiento de glándulas endocrinas y hormonas.'],
-            ['Gastroenterología', 'Enfermedades del aparato digestivo.'],
-            ['Ginecología y Obstetricia', 'Salud del sistema reproductor femenino y embarazo.'],
-            ['Hematología', 'Tratamiento de enfermedades de la sangre.'],
-            ['Medicina General', 'Atención primaria y diagnóstico preventivo.'],
-            ['Medicina Interna', 'Atención integral del adulto en enfermedades complejas.'],
-            ['Nefrología', 'Estudio de la estructura y función de los riñones.'],
-            ['Neumología', 'Enfermedades del sistema respiratorio.'],
-            ['Neurología', 'Tratamiento de trastornos del sistema nervioso.'],
-            ['Oftalmología', 'Diagnóstico y tratamiento de enfermedades oculares.'],
-            ['Oncología', 'Diagnóstico y tratamiento del cáncer.'],
-            ['Otorrinolaringología', 'Enfermedades de oído, nariz y garganta.'],
-            ['Pediatría', 'Atención médica de bebés, niños y adolescentes.'],
-            ['Psiquiatría', 'Diagnóstico y tratamiento de trastornos mentales.'],
-            ['Reumatología', 'Enfermedades de las articulaciones y tejidos conectivos.'],
-            ['Traumatología y Ortopedia', 'Lesiones en el sistema músculo-esquelético.'],
-            ['Urología', 'Afecciones del sistema urinario y aparato reproductor masculino.']
-        ];
-
-        // Ordenar alfabéticamente por el nombre (primer elemento del sub-array)
-        sort($especialidades_default);
-
-        foreach ($especialidades_default as $esp) {
-            $nombre = $esp[0];
-            $desc = $esp[1];
-
-            $sql_insert = "INSERT IGNORE INTO `$nombre_tabla` (`nombre`, `descripcion`, `activo`) 
-                        VALUES ('$nombre', '$desc', 1)";
-            $conn->query($sql_insert);
-        }
-
-        echo "\n ✅ Datos de especialidades (A-Z) cargados correctamente. \n";
 
     } else {
         echo "\n 🛠 La tabla '$nombre_tabla' ya existe. Aplicando modificaciones...\n";
