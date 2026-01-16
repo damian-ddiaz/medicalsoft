@@ -47,6 +47,7 @@ try {
         ['Ginecología y Obstetricia', 'Salud del sistema reproductor femenino y embarazo.'],
         ['Hematología', 'Tratamiento de enfermedades de la sangre.'],
         ['Medicina General', 'Atención primaria y diagnóstico preventivo.'],
+        ['Medicina Familiar', 'a personas de todas las edades, abordando la salud desde una perspectiva biopsicosocial que incluye a la familia y su entorno..'],
         ['Medicina Interna', 'Atención integral del adulto en enfermedades complejas.'],
         ['Nefrología', 'Estudio de la estructura y función de los riñones.'],
         ['Neumología', 'Enfermedades del sistema respiratorio.'],
@@ -58,7 +59,7 @@ try {
         ['Psiquiatría', 'Diagnóstico y tratamiento de trastornos mentales.'],
         ['Reumatología', 'Enfermedades de las articulaciones y tejidos conectivos.'],
         ['Traumatología y Ortopedia', 'Lesiones en el sistema músculo-esquelético.'],
-        ['Urología', 'Afecciones del sistema urinario y aparato reproductor masculino.']
+        ['Urología', 'Afecciones del sistema urinario y aparato reproductor masculino.'],   
     ];
 
      // Ordenar alfabéticamente por el nombre (primer elemento del sub-array)

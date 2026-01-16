@@ -67,7 +67,7 @@ try {
         echo " ✅ Modificaciones en '$nombre_tabla_alergias' aplicadas.\n";
     }
 
-    // --- especialidades_medicas ---
+    // --- sistema_especialidades_medicas ---
     $nombre_tabla = 'sistema_especialidades_medicas';
     $result = $conn->query("SHOW TABLES LIKE '$nombre_tabla'");
 
@@ -90,7 +90,7 @@ try {
         $conn->query($create_especialidades_sql);
         echo "\n ✅ Tabla '$nombre_tabla' creada correctamente. \n";
 
-        // --- especialidades_medicas ---
+    // --- sistema_especialidades_medicas ---
     $nombre_tabla = 'sistema_especialidades_medicas';
     $result = $conn->query("SHOW TABLES LIKE '$nombre_tabla'");
 
@@ -256,6 +256,58 @@ try {
 
     echo "\n ✅ Estructura de la tabla '$nombre_tabla' actualizada exitosamente.\n";
 }
+
+    // --- medicos_ficha ---
+    $nombre_tabla_medicos = 'medicos_ficha';
+    $result_medicos = $conn->query("SHOW TABLES LIKE '$nombre_tabla_medicos'");
+
+    if ($result_medicos->num_rows == 0) {
+        echo "\n 🆕 Tabla '$nombre_tabla_medicos' no existe. Creando...\n";
+
+        $create_medicos_sql = "
+            CREATE TABLE `$nombre_tabla_medicos` (
+                `id`                        INT(11) NOT NULL AUTO_INCREMENT,
+                `nombre`                    VARCHAR(100) NOT NULL,
+                `apellido`                  VARCHAR(100) NOT NULL,
+                `matricula_ministerio`      VARCHAR(50) NOT NULL,
+                `matricula_colegio`         VARCHAR(50) DEFAULT '',
+                `email`                     VARCHAR(150) DEFAULT '',
+                `telefono`                  VARCHAR(20) DEFAULT '',
+                `id_especialidad`           INT(11) NOT NULL,
+                `fecha_creacion`            TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_medico_ministerio` (`matricula_ministerio`),
+                UNIQUE KEY `uk_medico_email` (`email`),
+                CONSTRAINT `fk_medico_especialidad` 
+                    FOREIGN KEY (`id_especialidad`) 
+                    REFERENCES `sistema_especialidades_medicas` (`id_especialidad`) 
+                    ON DELETE RESTRICT ON UPDATE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ";
+
+        $conn->query($create_medicos_sql);
+        echo "\n ✅ Tabla '$nombre_tabla_medicos' creada correctamente.\n";
+
+    } else {
+        echo "\n 🛠 La tabla '$nombre_tabla_medicos' ya existe. Aplicando modificaciones...\n";
+
+        $alter_medicos_sqls = [
+            "MODIFY COLUMN `id`                   INT(11) NOT NULL AUTO_INCREMENT",
+            "MODIFY COLUMN `nombre`               VARCHAR(100) NOT NULL",
+            "MODIFY COLUMN `apellido`             VARCHAR(100) NOT NULL",
+            "MODIFY COLUMN `matricula_ministerio` VARCHAR(50) NOT NULL",
+            "MODIFY COLUMN `matricula_colegio`    VARCHAR(50) DEFAULT ''",
+            "MODIFY COLUMN `email`                VARCHAR(150) DEFAULT ''",
+            "MODIFY COLUMN `telefono`             VARCHAR(20) DEFAULT ''",
+            "MODIFY COLUMN `id_especialidad`      INT(11) NOT NULL"
+        ];
+
+        foreach ($alter_medicos_sqls as $sql) {
+            $conn->query("ALTER TABLE `$nombre_tabla_medicos` $sql");
+        }
+
+        echo "\n ✅ Estructura de la tabla '$nombre_tabla_medicos' actualizada exitosamente.\n";
+    }
 
 
     echo "\n ✅ ✅ ESTRUCTURA BD PROCESADA CORRECTAMENTE ✅ ✅...";
