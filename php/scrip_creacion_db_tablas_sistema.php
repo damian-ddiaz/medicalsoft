@@ -25,7 +25,56 @@ try {
     echo "✅ CONEXIÓN AL SERVIDOR Y BD '$target_db' EXITOSA";
     echo '<br>';
 
-    $var_decimal = "DECIMAL(15,2) DEFAULT 0.00";
+    // $var_decimal = "DECIMAL(15,2) DEFAULT 0.00";
+
+    // -- DATA GENERAL DEL SISTEMA --
+    // --- sistema_paises ---
+    $nombre_tabla_paises = 'sistema_paises';
+    $result_paises = $conn->query("SHOW TABLES LIKE '$nombre_tabla_paises'");
+
+    if ($result_paises->num_rows == 0) {
+        echo "\n 🆕 Tabla '$nombre_tabla_paises' no existe. Creando...\n";
+        echo '<br>';
+
+        $create_paises_sql = "
+            CREATE TABLE `$nombre_tabla_paises` (
+                `id`            INT(11) NOT NULL AUTO_INCREMENT,
+                `iso_alpha3`    CHAR(3) NOT NULL,
+                `iso_numeric`   CHAR(3) NOT NULL,
+                `nombre`        VARCHAR(100) NOT NULL,
+                `codigo_area`   VARCHAR(10),
+                `emoji_bandera` VARCHAR(10),
+                PRIMARY KEY (`id`),
+                UNIQUE KEY `uk_iso_alpha3` (`iso_alpha3`),
+                UNIQUE KEY `uk_iso_numeric` (`iso_numeric`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+        ";
+
+        if ($conn->query($create_paises_sql)) {
+            echo " ✅ Tabla '$nombre_tabla_paises' creada correctamente.\n";
+            echo '<br>';
+        }
+
+    } else {
+        echo "\n 🛠 La tabla '$nombre_tabla_paises' ya existe. Aplicando modificaciones...\n";
+        echo '<br>';
+
+        $alter_paises_sqls = [
+            "MODIFY COLUMN `id`            INT(11) NOT NULL AUTO_INCREMENT",
+            "MODIFY COLUMN `iso_alpha3`    CHAR(3) NOT NULL",
+            "MODIFY COLUMN `iso_numeric`   CHAR(3) NOT NULL",
+            "MODIFY COLUMN `nombre`        VARCHAR(100) NOT NULL",
+            "MODIFY COLUMN `codigo_area`   VARCHAR(10)",
+            "MODIFY COLUMN `emoji_bandera` VARCHAR(10)"
+        ];
+
+        foreach ($alter_paises_sqls as $sql) {
+            $conn->query("ALTER TABLE `$nombre_tabla_paises` $sql");
+        }
+        echo " ✅ Modificaciones en '$nombre_tabla_paises' aplicadas correctamente.\n";
+        echo '<br>';
+    }
+    
 
     // --- sistema_alergias ---
     $nombre_tabla_alergias = 'sistema_alergias';

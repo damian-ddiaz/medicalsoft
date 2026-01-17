@@ -15,6 +15,42 @@ try {
 
     $var_decimal = "DECIMAL(15,2) DEFAULT 0.00";
     // Data Predeterminada 
+    // --- Inserción de países iniciales ---
+    $paises_iniciales = [
+        ['ARG', '032', 'Argentina', '+54', '🇦🇷'],
+        ['BOL', '068', 'Bolivia', '+591', '🇧🇴'],
+        ['BRA', '076', 'Brasil', '+55', '🇧🇷'],
+        ['CHL', '152', 'Chile', '+56', '🇨🇱'],
+        ['COL', '170', 'Colombia', '+57', '🇨🇴'],
+        ['CRI', '188', 'Costa Rica', '+506', '🇨🇷'],
+        ['CUB', '192', 'Cuba', '+53', '🇨🇺'],
+        ['DOM', '214', 'República Dominicana', '+1', '🇩🇴'],
+        ['ECU', '218', 'Ecuador', '+593', '🇪🇨'],
+        ['SLV', '222', 'El Salvador', '+503', '🇸🇻'],
+        ['ESP', '724', 'España', '+34', '🇪🇸'],
+        ['USA', '840', 'Estados Unidos', '+1', '🇺🇸'],
+        ['GTM', '320', 'Guatemala', '+502', '🇬🇹'],
+        ['HND', '340', 'Honduras', '+504', '🇭🇳'],
+        ['MEX', '484', 'México', '+52', '🇲🇽'],
+        ['NIC', '558', 'Nicaragua', '+505', '🇳🇮'],
+        ['PAN', '591', 'Panamá', '+507', '🇵🇦'],
+        ['PRY', '600', 'Paraguay', '+595', '🇵🇾'],
+        ['PER', '604', 'Perú', '+51', '🇵🇪'],
+        ['PRI', '630', 'Puerto Rico', '+1', '🇵🇷'],
+        ['URY', '858', 'Uruguay', '+598', '🇺🇾'],
+        ['VEN', '862', 'Venezuela', '+58', '🇻🇪']
+    ];
+
+    foreach ($paises_iniciales as $pais) {
+        // Usamos INSERT IGNORE para evitar errores si los UK (iso_alpha3 o iso_numeric) ya existen
+        $sql = "INSERT IGNORE INTO sistema_paises (iso_alpha3, iso_numeric, nombre, codigo_area, emoji_bandera) 
+                VALUES ('{$pais[0]}', '{$pais[1]}', '{$pais[2]}', '{$pais[3]}', '{$pais[4]}')";
+        $conn->query($sql);
+    }
+    
+    echo "\n ✅ Datos de sistema_paises cargados correctamente (Latinoamérica e Iberoamérica). \n";
+    echo '<br>';
+
     // --- sistema_alergias ---
     $alergias_iniciales = [
         ['Medicamentosa', 'Penicilina', 'Vital/Anafilaxis', 'Shock anafiláctico, dificultad respiratoria.'],
@@ -47,7 +83,7 @@ try {
         ['Ginecología y Obstetricia', 'Salud del sistema reproductor femenino y embarazo.'],
         ['Hematología', 'Tratamiento de enfermedades de la sangre.'],
         ['Medicina General', 'Atención primaria y diagnóstico preventivo.'],
-        ['Medicina Familiar', 'a personas de todas las edades, abordando la salud desde una perspectiva biopsicosocial que incluye a la familia y su entorno..'],
+        ['Medicina Familiar', 'Atención a personas de todas las edades, abordando la salud desde una perspectiva biopsicosocial que incluye a la familia y su entorno..'],
         ['Medicina Interna', 'Atención integral del adulto en enfermedades complejas.'],
         ['Nefrología', 'Estudio de la estructura y función de los riñones.'],
         ['Neumología', 'Enfermedades del sistema respiratorio.'],
